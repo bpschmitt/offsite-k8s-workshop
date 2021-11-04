@@ -1,1 +1,1 @@
-## 01. Kubernetes Basics
+## 02. Deploy Apps
