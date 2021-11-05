@@ -22,6 +22,4 @@ minikube start --driver=hyperkit --cni=flannel --cpus=4 --memory=8000 -p minikub
 
 # Recommended Reading
 
-- One
-- Two
-- Three
+- [kubectl cheat sheet](https://kubernetes.io/docs/reference/kubectl/cheatsheet/?ref=hackernoon.com)
