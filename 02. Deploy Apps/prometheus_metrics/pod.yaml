@@ -1,0 +1,49 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: demo
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: prometheus-demo-metrics
+spec:
+  selector:
+    matchLabels:
+      app: prometheus-demo-metrics
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: prometheus-demo-metrics
+    spec:
+      containers:
+      - name: prometheus-demo-metrics
+        image: bpschmitt/prometheus-metrics-demo:1.0
+        resources:
+          limits:
+            memory: 128M
+            cpu: 100m
+        ports:
+        - containerPort: 8080
+      restartPolicy: Always
+---
+# apiVersion: v1
+# kind: Pod
+# metadata:
+#   namespace: demo
+#   annotations:
+#     newrelic/scrape: "true"
+#   name: prometheus-demo-metrics
+# spec:
+#   containers:
+#   - image: bpschmitt/prometheus-metrics-demo:1.0
+#     name: prometheus-demo-metrics
+#     ports:
+#     - containerPort: 8080
+#     resources:
+#       requests:
+#         cpu: 100m
+#       limits:
+#         cpu: 200m
+#   restartPolicy: Always
