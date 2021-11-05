@@ -17,7 +17,7 @@ brew install minikube kubectl helm git
 # Start your cluster
 
 ```
-minikube start --driver=hyperkit --cni=flannel --cpus=4 --memory=8000 -p minikube-lab
+minikube start --driver=hyperkit --cni=flannel --cpus=4 --memory=8000 -p minikube-workshop
 ```
 
 # Recommended Reading
