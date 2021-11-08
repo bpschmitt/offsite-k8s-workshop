@@ -1,4 +1,4 @@
-# offsite-k8s-workshop
+# offsite-k8s-workshop (NOTE: STILL A WORK IN PROGRESS)
 A Kubernetes workshop with a New Relic focus.
 
 # Pre-requisites
