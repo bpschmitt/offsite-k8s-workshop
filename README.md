@@ -9,9 +9,10 @@ This workshop was built and tested using Minikube.  Below are the pre-requisites
 - [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl-macos/)
 - [helm](https://helm.sh/docs/intro/install/#from-homebrew-macos)
 - [git](https://git-scm.com/download/mac)
+- hyperkit (if Docker Desktop is installed, you already have Hyperkit)
 
 ```
-brew install minikube kubectl helm git
+brew install minikube kubectl helm git hyperkit
 ```
 
 # Start your cluster
