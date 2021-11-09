@@ -9,13 +9,11 @@ nginx|Used to demonstrate New Relic's Infrastructure On-Host Integrations as wel
 nodejs_lic|Used to demonstrate New Relic APM, Logs-in-Context, and the connectec experience in the Kubernetes Cluster Explorer|
 prometheus_metrics|Provides custom Prometheus metrics exposed on a `/metrics` endpoint that can be scraped by the Prometheus OpenMetrics Integration (POMI)|
 ---
-<br>
 
 
 ### Create a `demo` namespace
-<br>
-Use the following command to create a namespace for your apps.
 
+Use the following command to create a namespace for your apps.
 
 ```
 [~]$ kubectl create namespace demo
@@ -23,7 +21,6 @@ namespace/demo created
 ```
 
 ### Run the `deploy-apps.sh` shell script
-<br>
 
 ```
 [~]$ ./deploy-apps.sh myDemoApp
@@ -52,10 +49,8 @@ prometheus-demo-metrics-6bbbc65c75-9xvwf   1/1     Running                      
 ### Conclusion
 
 In this module, you deployed some demo apps to a namespace called `demo`.  If you used the shell script to deploy the apps, be sure to check out the contents of the script and take note of the commands that were used.
-<br>
 
 ---
 
-<br>
 
 Let's jump over to [03. Troubleshooting section](), learn some new commands, and fix the `logs-demo-*` pod.
