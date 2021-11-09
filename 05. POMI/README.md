@@ -1,25 +1,66 @@
 ## 04. Working with the Prometheus OpenMetrics Integration (POMI)
 
+Prometheus metrics are a standard when it comes to Kubernetes clusters.  Many resources in a cluster expose Prometheus metrics using a `/metrics` endpoint.  Solutions like New Relic, Prometheus Server, and others are able to "scrape" these endpoints and collect metrics at various intervals.
+
+One of the main sources of metrics for New Relic's Infrastructure agent is Kube State Metrics (KSM).  This is an optional install as part of the Guided Install and often times, a KSM instance may already exist in the cluster.
+
+## Raw metrics exposed by endpoints
+
+Use the following command to identify the name of the KSM service in the `newrelic` name space.  Note that this service is exposing port 8080.  You'll need this in the next command.
+
 ```
-$ kubectl port-forward pod/prometheus-demo-metrics-6bbbc65c75-9xvwf -n demo 9999:8080
+$ kubectl get svc -n newrelic
+NAME                                     TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)    AGE
+newrelic-bundle-kube-state-metrics       ClusterIP   10.107.95.111   <none>        8080/TCP   15h
+newrelic-bundle-nri-metadata-injection   ClusterIP   10.105.206.11   <none>        443/TCP    15h
+```
+
+By using `kubectl port-forward`, you can forward ports from your local machine to cluster end points like the KSM service.  In this example, you'll forward the KSM service on port 8080 to your local machine on port 9999.  The local port is configurable so feel free to choose your own.  Just be careful not to choose something that's already in use.
+
+```
+$ kubectl port-forward svc/newrelic-bundle-kube-state-metrics -n newrelic 9999:8080
 Forwarding from 127.0.0.1:9999 -> 8080
 Forwarding from [::1]:9999 -> 8080
 ```
 
+
+Open a browser and visit `http://localhost:9999/metrics`.  You should now see a list of metrics that the KSM service is exposing within the cluster.  As previously mentioned, New Relic's Infrastructure agent uses these metrics as part of its normal data collection process.
+
+![KSM](https://p191.p3.n0.cdn.getcloudapp.com/items/bLudxKED/4368687f-5551-4462-b1b9-066f98ee134b.jpg?v=2017c2177ba2662fc2a06454e133824a)
+
+Use Control + C to cancel the `kubectl port-forward` command in your terminal.
+
+## Applying Kubernetes Labels
+
+But what if you've built an application that exposes custom Prometheus metrics?  This is where the Prometheus OpenMetrics Integration (POMI) can provide additional value.  It's able to dynamically collect any Prometheus metric exposed by an endpoint with a specific label or annotation.  The default label is `prometheus.io/scrape=true`, but can be customized in the POMI configuration.
+
+Run the following NRQL query in Query Builder.  You'll see that nothing is returned.  This is because our application that is exposing the custom Prometheus metrics does not have the proper label, therefore, POMI is not able to discover the `/metrics` endpoint.
+
+```
+FROM Metric select uniques(metricName) where instrumentation.name = 'nri-prometheus' and clusterName = 'minikube-lab' and metricName like 'python%' since 2 minutes ago
+```
+![Query Builder](https://p191.p3.n0.cdn.getcloudapp.com/items/qGuRrOy1/f82df250-3ca6-4839-8aab-19650cb55267.jpg?v=b5b4307b9867cb29c0522a008a0ee363)
+
+Use the following command to apply the `prometheus.io/scrape=true` label to the `prometheus-demo` service in the `demo` namespace.  POMI will now be able to discover this service by its label and immediately start collecting the metrics it exposes when the next scrape occurs.
+
 ```
 $ kubectl label svc prometheus-demo -n demo prometheus.io/scrape=true
 ```
+Now re-run the NRQL query and what do you see?
+
+_(It may take 30 seconds due to the polling interval - be patient and run the query a few times if you don't see anything returned immediately)_
 
 ```
-FROM Metric select uniques(metricName) where instrumentation.name = 'nri-prometheus' and clusterName = 'minikube-lab' and metricName like 'python%'
+FROM Metric select uniques(metricName) where instrumentation.name = 'nri-prometheus' and clusterName = 'minikube-lab' and metricName like 'python%' since 2 minutes ago
 ```
+![Moar metrics](https://p191.p3.n0.cdn.getcloudapp.com/items/7KuAq6qZ/0ac47e14-a90b-4d4b-b6d0-0a321d15b519.jpg?v=68192dbc4f559d64744d1c1d0988be26
+)
 
-```
-http://localhost:9999/metrics
-```
-
-![Prometheus Metrics](https://p191.p3.n0.cdn.getcloudapp.com/items/2NuPvdZ4/1dff9035-e7e6-4990-a1df-9c31371ff0c3.jpg?v=6bcd82fe330e8c18bee65e7878a048e0)
 
 ## To-Do: Better NRQL Query Examples for all Metric types
 
 * Reference: https://docs.newrelic.com/docs/infrastructure/prometheus-integrations/view-query-data/translate-promql-queries-nrql/
+
+## Resources
+
+* Prometheus Live Demo: http://demo.robustperception.io:9090/consoles/index.html
