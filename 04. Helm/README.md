@@ -67,3 +67,9 @@ newrelic-bundle-nri-kube-events-68778447d6-hvfrv          2/2     Running   0   
 newrelic-bundle-nri-metadata-injection-57858b7697-6q6sg   1/1     Running   0          5m17s
 newrelic-bundle-nri-prometheus-5544d858fb-rwtf9           1/1     Running   0          5m17s
 ```
+
+Congrats!  You've successfully installed New Relic and you should see your cluster in the Kubernetes Cluster Explorer in a minute or two.
+
+## Conclusion
+
+In this module, you installed New Relic into your cluster using the `nri-bundle` helm chart.  You also learned that in the Guided Install, the `--set` parameter is used to enable and/or configure variables for helm subcharts contained within the `nri-bundle` chart.  In the next few modules, you'll learn more about how to work with custom configurations.

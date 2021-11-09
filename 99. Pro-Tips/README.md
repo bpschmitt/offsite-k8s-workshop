@@ -22,6 +22,11 @@ PROTIP: Sort Kubenetes events by the `lastTimestap`.
 kubectl get events -A --sort-by='.lastTimestamp'
 ```
 
+PROTIP: View the pod logs for a previous instantiation of a container
+```
+kubectl logs crasher-6f4bccdddd-7hnp8 -n demo --previous
+```
+
 PROTIP: You can query API server endpoints directly with `kubectl get --raw /api/v1/<endpoint>`
 ```
 [~]$ kubectl get --raw /api/v1/namespaces
