@@ -56,6 +56,58 @@ FROM Metric select uniques(metricName) where instrumentation.name = 'nri-prometh
 ![Moar metrics](https://p191.p3.n0.cdn.getcloudapp.com/items/7KuAq6qZ/0ac47e14-a90b-4d4b-b6d0-0a321d15b519.jpg?v=68192dbc4f559d64744d1c1d0988be26
 )
 
+## Updating the POMI configuration to Filter Metrics
+
+```
+$ helm upgrade newrelic-bundle newrelic/nri-bundle -n newrelic --reuse-values -f ./values.yaml
+Release "newrelic-bundle" has been upgraded. Happy Helming!
+NAME: newrelic-bundle
+LAST DEPLOYED: Tue Nov  9 12:57:10 2021
+NAMESPACE: newrelic
+STATUS: deployed
+REVISION: 2
+TEST SUITE: None
+```
+
+```
+$ kubectl describe configmap newrelic-bundle-nri-prometheus-config -n newrelic
+Name:         newrelic-bundle-nri-prometheus-config
+Namespace:    newrelic
+Labels:       app.kubernetes.io/instance=newrelic-bundle
+              app.kubernetes.io/managed-by=Helm
+              app.kubernetes.io/name=nri-prometheus
+              app.kubernetes.io/version=2.9.0
+              helm.sh/chart=nri-prometheus-1.10.0
+Annotations:  meta.helm.sh/release-name: newrelic-bundle
+              meta.helm.sh/release-namespace: newrelic
+
+Data
+====
+config.yaml:
+----
+cluster_name: minikube-lab
+audit: false
+insecure_skip_verify: false
+require_scrape_enabled_label_for_nodes: true
+scrape_enabled_label: prometheus.io/scrape
+scrape_endpoints: false
+scrape_services: true
+transformations:
+- description: Workshop example
+  ignore_metrics:
+  - except:
+    - python_my_gauge
+    - python_my_counter
+    prefixes:
+    - python
+verbose: false
+```
+
+```
+$ kubectl delete pod newrelic-bundle-nri-prometheus-5544d858fb-rwtf9 -n newrelic
+pod "newrelic-bundle-nri-prometheus-5544d858fb-rwtf9" deleted
+```
+![no more metrics](https://p191.p3.n0.cdn.getcloudapp.com/items/d5u6Nnxq/3c64cf1b-46fa-4f32-942e-f6289628d279.jpg?v=e588426d95bcf87ddd90b605c74168e3)
 
 ## To-Do: Better NRQL Query Examples for all Metric types
 
