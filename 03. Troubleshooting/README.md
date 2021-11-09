@@ -1,98 +1,117 @@
+### 03. Troubleshooting
+
+There are a few common commands used to begin the troubleshooting process for the majority of issues in a Kubernetes cluster.  Those commands are:
+
+* `kubectl describe pod` (or other resource)
+* `kubectl logs pod`
+* `kubectl get events`
+
 ## Describing Resources
 
+Describing a Kubernetes resource (in this case, a pod) will output its current configuration as well as any related Kubernetes events.  This can be extremely useful in identifying why a pod might not be starting properly.
+
+There are a few things of note here:
+
+* The container state and reason (Waiting - CreateContainerConfigError)
+* The conditions: `Ready: False` and `ContainersReady: False`
+* The pod events, specifically `Error: secret "nrlicensekey" not found`
+
+You've found the culprit.  A required secret is missing so the pod is unable to start successfully.  This happens to be the secret that contains your New Relic license key.  In the next step, you'll create it to resolve the issue.
+
 ```
-[~]$ kubectl describe pod coredns-74ff55c5b-d2vpb -n kube-system
-Name:                 coredns-74ff55c5b-d2vpb
-Namespace:            kube-system
-Priority:             2000000000
-Priority Class Name:  system-cluster-critical
-Node:                 minikube-workshop/192.168.49.2
-Start Time:           Wed, 27 Oct 2021 15:06:12 -0500
-Labels:               k8s-app=kube-dns
-                      pod-template-hash=74ff55c5b
-Annotations:          <none>
-Status:               Running
-IP:                   172.17.0.2
+[~]$ kubectl describe pod logs-demo-f764d7569-cvh89 -n demo
+Name:         logs-demo-f764d7569-cvh89
+Namespace:    demo
+Priority:     0
+Node:         minikube-lab/192.168.64.12
+Start Time:   Mon, 08 Nov 2021 17:17:17 -0600
+Labels:       app=logs-demo
+              pod-template-hash=f764d7569
+Annotations:  <none>
+Status:       Pending
+IP:           10.244.0.94
 IPs:
-  IP:           172.17.0.2
-Controlled By:  ReplicaSet/coredns-74ff55c5b
+  IP:           10.244.0.94
+Controlled By:  ReplicaSet/logs-demo-f764d7569
 Containers:
-  coredns:
-    Container ID:  docker://2f8b82db645bfe4135bc8e4b9ac1611181c08895d4682ddc3b5477e51030634d
-    Image:         k8s.gcr.io/coredns:1.7.0
-    Image ID:      docker-pullable://k8s.gcr.io/coredns@sha256:73ca82b4ce829766d4f1f10947c3a338888f876fbed0540dc849c89ff256e90c
-    Ports:         53/UDP, 53/TCP, 9153/TCP
-    Host Ports:    0/UDP, 0/TCP, 0/TCP
-    Args:
-      -conf
-      /etc/coredns/Corefile
-    State:          Running
-      Started:      Wed, 27 Oct 2021 15:06:14 -0500
-    Ready:          True
+  nodejs-logs-k8s:
+    Container ID:
+    Image:          bpschmitt/nodejs-logs-k8s:0.5
+    Image ID:
+    Port:           4000/TCP
+    Host Port:      0/TCP
+    State:          Waiting
+      Reason:       CreateContainerConfigError
+    Ready:          False
     Restart Count:  0
     Limits:
-      memory:  170Mi
+      cpu:     250m
+      memory:  256M
     Requests:
-      cpu:        100m
-      memory:     70Mi
-    Liveness:     http-get http://:8080/health delay=60s timeout=5s period=10s #success=1 #failure=5
-    Readiness:    http-get http://:8181/ready delay=0s timeout=1s period=10s #success=1 #failure=3
-    Environment:  <none>
+      cpu:     250m
+      memory:  256M
+    Environment:
+      NEW_RELIC_LICENSE_KEY:                               <set to the key 'nrlicensekey' in secret 'nrlicensekey'>  Optional: false
+      NEW_RELIC_APP_NAME:                                  myDemoApp
+      APP_TITLE:                                           myDemoApp
+      NEW_RELIC_METADATA_KUBERNETES_CLUSTER_NAME:          minikube-lab
+      NEW_RELIC_METADATA_KUBERNETES_NODE_NAME:              (v1:spec.nodeName)
+      NEW_RELIC_METADATA_KUBERNETES_NAMESPACE_NAME:        demo (v1:metadata.namespace)
+      NEW_RELIC_METADATA_KUBERNETES_POD_NAME:              logs-demo-f764d7569-cvh89 (v1:metadata.name)
+      NEW_RELIC_METADATA_KUBERNETES_CONTAINER_NAME:        nodejs-logs-k8s
+      NEW_RELIC_METADATA_KUBERNETES_CONTAINER_IMAGE_NAME:  bpschmitt/nodejs-logs-k8s:0.5
+      NEW_RELIC_METADATA_KUBERNETES_DEPLOYMENT_NAME:       logs-demo
     Mounts:
-      /etc/coredns from config-volume (ro)
-      /var/run/secrets/kubernetes.io/serviceaccount from coredns-token-8b4xf (ro)
+      /var/run/secrets/kubernetes.io/serviceaccount from default-token-75ldr (ro)
 Conditions:
   Type              Status
   Initialized       True
-  Ready             True
-  ContainersReady   True
+  Ready             False
+  ContainersReady   False
   PodScheduled      True
 Volumes:
-  config-volume:
-    Type:      ConfigMap (a volume populated by a ConfigMap)
-    Name:      coredns
-    Optional:  false
-  coredns-token-8b4xf:
+  default-token-75ldr:
     Type:        Secret (a volume populated by a Secret)
-    SecretName:  coredns-token-8b4xf
+    SecretName:  default-token-75ldr
     Optional:    false
-QoS Class:       Burstable
-Node-Selectors:  kubernetes.io/os=linux
-Tolerations:     CriticalAddonsOnly op=Exists
-                 node-role.kubernetes.io/control-plane:NoSchedule
-                 node-role.kubernetes.io/master:NoSchedule
-                 node.kubernetes.io/not-ready:NoExecute op=Exists for 300s
+QoS Class:       Guaranteed
+Node-Selectors:  <none>
+Tolerations:     node.kubernetes.io/not-ready:NoExecute op=Exists for 300s
                  node.kubernetes.io/unreachable:NoExecute op=Exists for 300s
 Events:
-  Type    Reason     Age   From               Message
-  ----    ------     ----  ----               -------
-  Normal  Scheduled  12m   default-scheduler  Successfully assigned kube-system/coredns-74ff55c5b-d2vpb to minikube-workshop
-  Normal  Pulled     12m   kubelet            Container image "k8s.gcr.io/coredns:1.7.0" already present on machine
-  Normal  Created    11m   kubelet            Created container coredns
-  Normal  Started    11m   kubelet            Started container coredns
+  Type     Reason     Age                  From               Message
+  ----     ------     ----                 ----               -------
+  Normal   Scheduled  51m                  default-scheduler  Successfully assigned demo/logs-demo-f764d7569-cvh89 to minikube-lab
+  Warning  Failed     30m (x94 over 51m)   kubelet            Error: secret "nrlicensekey" not found
+  Normal   Pulled     68s (x231 over 51m)  kubelet            Container image "bpschmitt/nodejs-logs-k8s:0.5" already present on machine
+```
+
+## Create the Secret
+
+Create the `nrlicensekey` secret using the command below.  The `logs-demo-*` pod should automatically start and the status should be `Running`.  Do you remember the command to list the pods in a namespace?
+
+```
+[~]$ kubectl create secret generic nrlicensekey --from-literal=nrlicensekey=<YOUR LICENSE KEY> -n demo
 ```
 
 ## Events
 
+Sometimes the root cause of a cranky deployment may not be completely obvious from the pod events and you'll need to take a broader look at the cluster events.  You can do this with the `kubectl get event` command.  Note that the example below is scoped to the `demo` namespace.
 ```
-  [~]$ kubectl get events -n kube-system
-LAST SEEN   TYPE      REASON              OBJECT                               MESSAGE
-12m         Normal    Scheduled           pod/coredns-74ff55c5b-d2vpb          Successfully assigned kube-system/coredns-74ff55c5b-d2vpb to minikube-workshop
-12m         Normal    Pulled              pod/coredns-74ff55c5b-d2vpb          Container image "k8s.gcr.io/coredns:1.7.0" already present on machine
-12m         Normal    Created             pod/coredns-74ff55c5b-d2vpb          Created container coredns
-12m         Normal    Started             pod/coredns-74ff55c5b-d2vpb          Started container coredns
-12m         Normal    SuccessfulCreate    replicaset/coredns-74ff55c5b         Created pod: coredns-74ff55c5b-d2vpb
-12m         Normal    ScalingReplicaSet   deployment/coredns                   Scaled up replica set coredns-74ff55c5b to 1
-12m         Normal    LeaderElection      endpoints/k8s.io-minikube-hostpath   minikube-workshop_0a4bd673-a799-423a-a386-6b9619e73d8b became leader
-12m         Normal    Scheduled           pod/kube-proxy-kgggq                 Successfully assigned kube-system/kube-proxy-kgggq to minikube-workshop
-12m         Normal    Pulled              pod/kube-proxy-kgggq                 Container image "k8s.gcr.io/kube-proxy:v1.20.7" already present on machine
-12m         Normal    Created             pod/kube-proxy-kgggq                 Created container kube-proxy
-12m         Normal    Started             pod/kube-proxy-kgggq                 Started container kube-proxy
-12m         Normal    SuccessfulCreate    daemonset/kube-proxy                 Created pod: kube-proxy-kgggq
-12m         Warning   FailedScheduling    pod/storage-provisioner              0/1 nodes are available: 1 node(s) had taint {node.kubernetes.io/not-ready: }, that the pod didn't tolerate.
-12m         Normal    Scheduled           pod/storage-provisioner              Successfully assigned kube-system/storage-provisioner to minikube-workshop
-12m         Normal    Pulled              pod/storage-provisioner              Container image "gcr.io/k8s-minikube/storage-provisioner:v5" already present on machine
-12m         Normal    Created             pod/storage-provisioner              Created container storage-provisioner
-12m         Normal    Started             pod/storage-provisioner              Started container storage-provisioner
+[~]$ k get events -n demo
+LAST SEEN   TYPE      REASON              OBJECT                                          MESSAGE
+...
+4m36s       Normal    Pulled              pod/logs-demo-f764d7569-cvh89                   Container image "bpschmitt/nodejs-logs-k8s:0.5" already present on machine
+39m         Warning   Failed              pod/logs-demo-f764d7569-cvh89                   Error: secret "nrlicensekey" not found
+59m         Normal    SuccessfulCreate    replicaset/logs-demo-f764d7569                  Created pod: logs-demo-f764d7569-cvh89
+59m         Normal    ScalingReplicaSet   deployment/logs-demo                            Scaled up replica set logs-demo-f764d7569 to 1
+59m         Normal    Scheduled           pod/nginx-557dcdb56b-v4d4c                      Successfully assigned demo/nginx-557dcdb56b-v4d4c to minikube-lab
+59m         Normal    Pulling             pod/nginx-557dcdb56b-v4d4c                      Pulling image "nginx"
+59m         Normal    Pulled              pod/nginx-557dcdb56b-v4d4c                      Successfully pulled image "nginx" in 1.079547333s
+59m         Normal    Created             pod/nginx-557dcdb56b-v4d4c                      Created container nginx
+59m         Normal    Started             pod/nginx-557dcdb56b-v4d4c                      Started container nginx
+59m         Normal    SuccessfulCreate    replicaset/nginx-557dcdb56b                     Created pod: nginx-557dcdb56b-v4d4c
+59m         Normal    ScalingReplicaSet   deployment/nginx                                Scaled up replica set nginx-557dcdb56b to 1
+...
 ```
 
