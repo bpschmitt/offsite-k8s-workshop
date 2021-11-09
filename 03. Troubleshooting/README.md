@@ -1,4 +1,4 @@
-### 03. Troubleshooting
+## 03. Troubleshooting
 
 There are a few common commands used to begin the troubleshooting process for the majority of issues in a Kubernetes cluster.  Those commands are:
 
@@ -6,7 +6,7 @@ There are a few common commands used to begin the troubleshooting process for th
 * `kubectl logs pod`
 * `kubectl get events`
 
-## Describing Resources
+### Describing Resources
 
 Describing a Kubernetes resource (in this case, a pod) will output its current configuration as well as any related Kubernetes events.  This can be extremely useful in identifying why a pod might not be starting properly.
 
@@ -86,9 +86,11 @@ Events:
   Normal   Pulled     68s (x231 over 51m)  kubelet            Container image "bpschmitt/nodejs-logs-k8s:0.5" already present on machine
 ```
 
-## Create the Secret
+### Create the Secret
 
-Create the `nrlicensekey` secret using the command below.  The `logs-demo-*` pod should automatically start and the status should be `Running`.  Do you remember the command to list the pods in a namespace?
+Create the `nrlicensekey` secret using the command below.  The `logs-demo-*` pod should automatically start and the status should be `Running`.
+
+Do you remember the command to list the pods in a namespace?
 
 ```
 [~]$ kubectl create secret generic nrlicensekey --from-literal=nrlicensekey=<YOUR LICENSE KEY> -n demo
@@ -113,7 +115,7 @@ Data
 nrlicensekey:  40 bytes
 ```
 
-## Events
+### Events
 
 Sometimes the root cause of a cranky deployment may not be completely obvious from the pod events and you'll need to take a broader look at the cluster events.  You can do this with the `kubectl get event` command.  Note that the example below is scoped to the `demo` namespace.
 ```
@@ -134,3 +136,40 @@ LAST SEEN   TYPE      REASON              OBJECT                                
 ...
 ```
 
+### Logs
+
+The `kubectl logs` command will show you the container logs for applications running in your pods.  Typically, this is also a great source of information when trying to troubleshoot a problem.  In this example, you'll look at the logs for the `crasher-*` pod and it will be very obvious what's wrong.
+
+```
+$ kubectl logs crasher-6f4bccdddd-7hnp8 -n demo
+Traceback (most recent call last):
+  File "./app.py", line 9, in <module>
+    with open('Data.txt') as f:
+FileNotFoundError: [Errno 2] No such file or directory: 'Data.txt'
+```
+
+If you describe that pod, take a closer look at the `Containers` section for more detail as to what's happening.  You'll see the container exit code is `1` because of the error above.  The container is not able to successfully start and the `restartPolicy` for the container is `Always`.  This means that Kubernetes will try to restart the container if it fails, which is why the restart count continues to go up.
+
+```
+$ k describe pod crasher-6f4bccdddd-7hnp8 -n demo
+... Truncated ...
+
+Containers:
+  crasher:
+    Container ID:   docker://49a799e1cd9709974ed621799289bb7de95ea128100ad7d246b48b12378a3450
+    Image:          mlda065/crasher
+    Image ID:       docker-pullable://mlda065/crasher@sha256:3f41331adf0362ab245866a8f1a346d867c934b63b2733c0c714b3d4183a490d
+    Port:           <none>
+    Host Port:      <none>
+    State:          Waiting
+      Reason:       CrashLoopBackOff
+    Last State:     Terminated
+      Reason:       Error
+      Exit Code:    1
+      Started:      Mon, 08 Nov 2021 21:49:11 -0600
+      Finished:     Mon, 08 Nov 2021 21:49:11 -0600
+    Ready:          False
+    Restart Count:  58
+
+  ... Truncated ...
+  ```

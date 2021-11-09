@@ -14,7 +14,9 @@ Navigate to the Guided Install for Kubernetes in New Relic's UI and follow the p
 
 ![Guided Install](https://p191.p3.n0.cdn.getcloudapp.com/items/2NuPPg7z/0c8e6b5e-bd71-4fca-9fc0-5add7cfb5a4f.jpg?v=0981942fbdfb62d1d0aefd320e8cf2d1)
 
-When you get to the `Choose install method` prompt, you should see a command that looks similar to this.  Copy the command and run it on your command line.
+When you get to the `Choose install method` prompt, you should see a command that looks similar to this.  Note that the `--set` command is being used to configure specific chart variables during the install process.  These variables (e.g. `prometheus.enabled=true`) are enabling [subcharts](https://helm.sh/docs/chart_template_guide/subcharts_and_globals/) in the `nri-bundle` chart. You're also setting a `global.cluster` name and a `global.licenseKey` used by all subcharts.
+
+Copy the command and run it on your command line to install New Relic in your cluster.
 
 ```
 $ helm repo add newrelic https://helm-charts.newrelic.com && helm repo update && \
@@ -47,7 +49,21 @@ REVISION: 1
 TEST SUITE: None
  ```
 
+To view the installed charts, run the command below.
  ```
-$ helm list -A
+$ helm list -n newrelic
 NAME           	NAMESPACE	REVISION	UPDATED                             	STATUS  	CHART           	APP VERSION
 newrelic-bundle	newrelic 	1       	2021-11-08 21:14:35.692135 -0600 CST	deployed	nri-bundle-3.2.4	1.0
+```
+After a minute or two, you should see the following pods running in the `newrelic` namespace in your cluster.
+
+```
+$ kubectl get pods -n newrelic
+NAME                                                      READY   STATUS    RESTARTS   AGE
+newrelic-bundle-kube-state-metrics-584569bf65-89xx2       1/1     Running   0          5m17s
+newrelic-bundle-newrelic-infrastructure-xtdkg             1/1     Running   0          5m17s
+newrelic-bundle-newrelic-logging-2xvpb                    1/1     Running   0          5m16s
+newrelic-bundle-nri-kube-events-68778447d6-hvfrv          2/2     Running   0          5m17s
+newrelic-bundle-nri-metadata-injection-57858b7697-6q6sg   1/1     Running   0          5m17s
+newrelic-bundle-nri-prometheus-5544d858fb-rwtf9           1/1     Running   0          5m17s
+```

@@ -8,7 +8,7 @@ infrastructure:
 
 # enables nri-prometheus
 prometheus:
-  enabled: false
+  enabled: true
 
 # enables nri-metadata-injection
 webhook:
@@ -40,7 +40,7 @@ newrelic-infra-operator:
 
 # enables newrelic-k8s-metrics-adapter
 metrics-adapter:
-  enabled: true
+  enabled: false
 
 newrelic-k8s-metrics-adapter:
   personalAPIKey: <REDACTED>
