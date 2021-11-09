@@ -119,7 +119,7 @@ nrlicensekey:  40 bytes
 
 Sometimes the root cause of a cranky deployment may not be completely obvious from the pod events and you'll need to take a broader look at the cluster events.  You can do this with the `kubectl get event` command.  Note that the example below is scoped to the `demo` namespace.
 ```
-[~]$ k get events -n demo
+[~]$ kubectl get events -n demo
 LAST SEEN   TYPE      REASON              OBJECT                                          MESSAGE
 ...
 4m36s       Normal    Pulled              pod/logs-demo-f764d7569-cvh89                   Container image "bpschmitt/nodejs-logs-k8s:0.5" already present on machine
@@ -151,7 +151,7 @@ FileNotFoundError: [Errno 2] No such file or directory: 'Data.txt'
 If you describe that pod, take a closer look at the `Containers` section for more detail as to what's happening.  You'll see the container exit code is `1` because of the error above.  The container is not able to successfully start and the `restartPolicy` for the container is `Always`.  This means that Kubernetes will try to restart the container if it fails, which is why the restart count continues to go up.
 
 ```
-$ k describe pod crasher-6f4bccdddd-7hnp8 -n demo
+$ kubectl describe pod crasher-6f4bccdddd-7hnp8 -n demo
 ... Truncated ...
 
 Containers:
