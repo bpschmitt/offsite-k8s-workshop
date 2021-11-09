@@ -2,7 +2,7 @@
 
 There are a few common commands used to begin the troubleshooting process for the majority of issues in a Kubernetes cluster.  Those commands are:
 
-* `kubectl describe pod` (or other resource)
+* `kubectl describe pod` (or other resources like `node`, `deployment`, etc)
 * `kubectl logs pod`
 * `kubectl get events`
 
@@ -92,6 +92,25 @@ Create the `nrlicensekey` secret using the command below.  The `logs-demo-*` pod
 
 ```
 [~]$ kubectl create secret generic nrlicensekey --from-literal=nrlicensekey=<YOUR LICENSE KEY> -n demo
+```
+
+You can validate that the secret was created successfully with the following command:
+```
+[~]$ kubectl get secret nrlicensekey -n demo
+NAME           TYPE     DATA   AGE
+nrlicensekey   Opaque   1      153m
+
+[~]$ kubectl describe secret nrlicensekey -n demo
+Name:         nrlicensekey
+Namespace:    demo
+Labels:       <none>
+Annotations:  <none>
+
+Type:  Opaque
+
+Data
+====
+nrlicensekey:  40 bytes
 ```
 
 ## Events

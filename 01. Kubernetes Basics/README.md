@@ -1,6 +1,6 @@
 ## 01. Kubernetes Basics
 
-In this module, you'll cover some of the very basic `kubectl` commands and their output.  The goal is to get you comfortable with interacting with a Kubernetes cluster and interpreting the output of the various commands.
+In this workshop, you'll cover some of the very basic `kubectl` commands and their output.  The goal is to get you comfortable with interacting with a Kubernetes cluster and interpreting the output of the various commands.
 
 **Reading:**
 * Learn about [Kubernetes Components](https://kubernetes.io/docs/concepts/overview/components/)
