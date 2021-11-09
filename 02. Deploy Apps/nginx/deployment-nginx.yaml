@@ -2,7 +2,6 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: nginx-conf
-  namespace: demo
 data:
   nginx.conf: |
     user nginx;
@@ -47,7 +46,6 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: nginx
-  namespace: demo
 spec:
   replicas: 1
   selector:
@@ -85,7 +83,6 @@ apiVersion: v1
 kind: Service
 metadata:
   name: nginx
-  namespace: demo
 spec:
   type: LoadBalancer
   ports:
