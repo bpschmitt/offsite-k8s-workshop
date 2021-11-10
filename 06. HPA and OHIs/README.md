@@ -37,7 +37,7 @@ newrelic-infrastructure:
               REMOTE_MONITORING: 1
 ```
 
-## Horizontal Pod Autoscaling
+## Custom Metrics Adapter for Horizontal Pod Autoscaling
 
 [New Relic's Kubernetes Metric Adapter](https://github.com/newrelic/helm-charts/tree/master/charts/newrelic-k8s-metrics-adapter) enables developers to scale their deployments using the Kubernetes [Horizontal Pod Autoscaler](https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/).  Imagine needing to dynamically scale your services to support an increase in throughput during your biggest day?  With the metric adapter, you can now query New Relic using NRQL and use the value returned for evaluation within HPA.
 
@@ -60,12 +60,96 @@ newrelic-k8s-metrics-adapter:
         query: "from Metric select average(nginx.server.net.requestsPerSecond) since 2 minutes ago"
 ```
 
+
 ## Updating the `newrelic-bundle` Helm release
 
-Now that you've modified your `values.yaml` for both the NGINX OHI and the metrics adapter, it's time to update the `newrelic-bundle` release with the new configuration.
+Now that you've modified your `values.yaml` for both the NGINX OHI and the metrics adapter, it's time to upgrade the `newrelic-bundle` release with the new configuration.
 
+You'll notice this command is a lot shorter than the original one from the Guided Install UI.  That's because you're upgrading an existing release and you've moved all configuration to a `values.yaml` file. A couple new options are being used for the [helm upgrade](https://helm.sh/docs/helm/helm_upgrade/):
+
+* `--reuse-values` - when upgrading, reuse the last release's values and merge in any overrides from the command line via `--set` and `-f`.
+* `-f` - specify values in a YAML file or a URL (can specify multiple)
 ```
 $ helm upgrade newrelic-bundle newrelic/nri-bundle -n newrelic --reuse-values -f ./values.yaml
+Release "newrelic-bundle" has been upgraded. Happy Helming!
+NAME: newrelic-bundle
+LAST DEPLOYED: Tue Nov  9 21:46:03 2021
+NAMESPACE: newrelic
+STATUS: deployed
+REVISION: 7
+TEST SUITE: None
+```
+
+You can run a quick validation using NRQL that the NGINX OHI has been configured successfully.  You should see rows returned in query builder.
+```
+FROM NginxSample select podName, net.connectionsActive where clusterName = 'minikube-lab'
+```
+
+## Create HPA
+
+Congrats! You've configured the NGINX OHI and the custom metrics adapter.  Now it's time to create the HPA resource in your cluster so that your NGINX deployment will autoscale based on metric data that exists in New Relic.
+
+Let's take a look at the `hpa.yaml` file.  In this file, you're creating a custom metric called `nginx_average_requests` which is created and stored in Kubernetes.  Kubernetes will auto-scale the `nginx` deployment up or down so that the value returned by the NRQL query is below the `target.value` of `2`.
+
+```
+kind: HorizontalPodAutoscaler
+apiVersion: autoscaling/v2beta2
+metadata:
+  name: nginx-scaler
+  namespace: demo
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: nginx
+  minReplicas: 1
+  maxReplicas: 10
+  metrics:
+    - type: External
+      external:
+        metric:
+          name: nginx_average_requests
+          selector:
+            matchLabels:
+              k8s.namespaceName: demo
+        target:
+          type: Value
+          value: 2
+  behavior:
+    scaleDown:
+      stabilizationWindowSeconds: 90
+    scaleUp:
+      stabilizationWindowSeconds: 90
+```
+
+You can query the Kubernetes API directly to see the values being evaluated.
+
+```
+$ kubectl get --raw "/apis/external.metrics.k8s.io/v1beta1/namespaces/*/nginx_average_requests?labelSelector=k8s.namespaceName=demo"
+
+{"kind":"ExternalMetricValueList","apiVersion":"external.metrics.k8s.io/v1beta1","metadata":{},"items":[{"metricName":"nginx_average_requests","metricLabels":{},"timestamp":"2021-11-10T04:25:00Z","value":"33333u"}]}
+```
+
+Run the following command to create the HPA resource in your cluster.
+
+```
+$ kubectl apply -f hpa.yaml -n demo
+```
+
+Validate that it was created and note the existing values under the `TARGETS` section.  Kubernetes uses `milliunits` so you'll see strange numbers like `3400m` show up here.  For illustration purposes, this means `3400 / 1000 = 3.4`.
+
+Keep this command handy, you'll come back to it.
+
+```
+$ kubectl get hpa nginx-scaler -n demo
+NAME           REFERENCE          TARGETS   MINPODS   MAXPODS   REPLICAS   AGE
+nginx-scaler   Deployment/nginx   34m/2     1         10        1          15m
+```
+
+## Generate Load
+
+```
+$ kubectl apply -f loadgen.yaml -n demo
 ```
 
 

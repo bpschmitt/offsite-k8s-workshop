@@ -8,4 +8,4 @@ spec:
     image: jsha/dnsutils:latest
     # Generate some load to the NGINX service
     command: [ "/bin/bash", "-c", "--" ]
-    args: [ "while true; do curl -s http://nginx:80; sleep .3; done;" ]
+    args: [ "while true; do curl -s http://nginx:80; sleep .2; done;" ]
