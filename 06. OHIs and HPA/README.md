@@ -1,5 +1,19 @@
 ## 06. On-Host Integrations (OHIs) and Horizontal Pod Autoscaling (HPA)
 
+In this module, you will:
+
+* Configure the NGINX OHI to auto-discover NGINX instances running in the cluster
+* Enable the custom metrics adapter for HPA and configured a custom metric (`nginx_average_requests` for auto-scaling)
+* Create the `nginx-scaler` HPA resource
+* Generate load to the `nginx` service in order to trigger the auto-scaling process
+
+__Reading__:
+
+* Learn about the [Horizontal Pod Autoscaler](https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/)
+* Learn about options when running [helm upgrade](https://helm.sh/docs/helm/helm_upgrade/)
+
+---
+
 New Relic's On-Host Integrations use [Kubernetes service auto-discovery](https://github.com/newrelic/nri-discovery-kubernetes) to identify available 3rd party services running in the cluster.  All supported OHIs are shipped with the New Relic Infrastructure agent in a Kubernetes cluster.  All you need to do is provided a valid configuration when you install the `newrelic-infrastructure` subchart.
 
 ## Enabling the NGINX OHI
@@ -85,7 +99,7 @@ You can run a quick validation using NRQL that the NGINX OHI has been configured
 FROM NginxSample select podName, net.connectionsActive where clusterName = 'minikube-lab'
 ```
 
-## Create HPA
+## Create `nginx-scaler` HPA resource
 
 Congrats! You've configured the NGINX OHI and the custom metrics adapter.  Now it's time to create the HPA resource in your cluster so that your NGINX deployment will autoscale based on metric data that exists in New Relic.
 
