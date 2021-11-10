@@ -97,7 +97,7 @@ TEST SUITE: None
 
 You can run a quick validation using NRQL that the NGINX OHI has been configured successfully.  You should see rows returned in query builder.
 ```
-FROM NginxSample select podName, net.connectionsActive where clusterName = 'minikube-lab'
+FROM NginxSample select podName, net.connectionsActive where clusterName = 'minikube-workshop'
 ```
 
 ## Create `nginx-scaler` HPA resource
@@ -201,7 +201,7 @@ FROM K8sPodSample select uniqueCount(podName) as 'Pod Count' where podName like 
 
 Here you can see as the average throughput increases, HPA kicks in and scales the deployment until the average throughput is below the target value of 2.
 
-![Autoscale](https://p191.p3.n0.cdn.getcloudapp.com/items/geupdnr1/e8b80301-7ecd-451d-b381-70fb52f23ff2.jpg?v=573739dcb397bcaf24e76c5d67161e7d)
+![Autoscale](https://p191.p3.n0.cdn.getcloudapp.com/items/DOu6mbWZ/68c68579-6c95-4940-8a88-923c2f607bb9.jpg?v=8db29e4462645dc093dbc5f445752972)
 
 ## Conclusion
 
