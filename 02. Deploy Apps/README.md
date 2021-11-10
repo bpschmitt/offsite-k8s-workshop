@@ -1,6 +1,6 @@
 ## 02. Deploy Apps
 
-The apps in this directory can be used to demonstrate various Kubernetes concepts.
+In this module, you'll deploy some demo apps which will be used to illustrate the various concepts found within this workshop.
 
 |Directory|Description|
 ---|---
@@ -33,7 +33,7 @@ service/logs-demo created
 deployment.apps/logs-demo created
 ```
 
-### Check output
+### Check Pod Status
 
 Your output should look similar to this.  Both the `crasher-*` pod and the `logs-demo-*` pod are expected to have errors.  Don't panic, we'll be fixing the `logs-demo-*` deployment in just a bit.  `crasher-*` will always be...crashing.
 

@@ -1,6 +1,6 @@
 ## 03. Troubleshooting
 
-There are a few common commands used to begin the troubleshooting process for the majority of issues in a Kubernetes cluster.  Those commands are:
+In this module you'll learn about some of the more common troubleshooting commands used when troubleshooting issues with a Kubernetes deployment.  Those commands are:
 
 * `kubectl describe pod` (or other resources like `node`, `deployment`, etc)
 * `kubectl logs pod`

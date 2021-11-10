@@ -58,6 +58,22 @@ FROM Metric select uniques(metricName) where instrumentation.name = 'nri-prometh
 
 ## Updating the POMI configuration to Filter Metrics
 
+What if you only want to collect a subset of metrics in the cluster?  Open the `values.yaml` file in this directory and find the `nri-prometheus` section.  In this section, you are configuring the `nri-prometheus` subchart to filter out all metrics that have the `python` prefix _except_ `python_my_gauge` and `python_my_counter`.  You're also setting the `scrape_enabled_label` which tells POMI which resources to scrape metrics from in the cluster.
+
+```
+nri-prometheus:
+  config:
+    scrape_enabled_label: prometheus.io/scrape
+    transformations:
+      - description: "Workshop example"
+        ignore_metrics:
+          - prefixes:
+              - python
+            except:
+              - python_my_gauge
+              - python_my_counter
+```
+
 ```
 $ helm upgrade newrelic-bundle newrelic/nri-bundle -n newrelic --reuse-values -f ./values.yaml
 Release "newrelic-bundle" has been upgraded. Happy Helming!
