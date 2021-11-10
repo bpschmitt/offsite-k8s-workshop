@@ -1,4 +1,4 @@
-## 06. HPA and OHIs
+## 06. Horizontal Pod Autoscaling (HPA) and On-Host Integrations (OHIs)
 
 ![Image](https://docs.newrelic.com/550f34a8085779979e628c68bc885d1a/adapter-diagram.svg)
 

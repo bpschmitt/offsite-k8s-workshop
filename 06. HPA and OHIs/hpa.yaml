@@ -20,4 +20,9 @@ spec:
               k8s.namespaceName: demo
         target:
           type: Value
-          value: 5
+          value: 2
+  behavior:
+    scaleDown:
+      stabilizationWindowSeconds: 90
+    scaleUp:
+      stabilizationWindowSeconds: 90
