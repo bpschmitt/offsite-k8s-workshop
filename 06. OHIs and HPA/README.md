@@ -1,4 +1,4 @@
-## 06. Horizontal Pod Autoscaling (HPA) and On-Host Integrations (OHIs)
+## 06. On-Host Integrations (OHIs) and Horizontal Pod Autoscaling (HPA)
 
 New Relic's On-Host Integrations use [Kubernetes service auto-discovery](https://github.com/newrelic/nri-discovery-kubernetes) to identify available 3rd party services running in the cluster.  All supported OHIs are shipped with the New Relic Infrastructure agent in a Kubernetes cluster.  All you need to do is provided a valid configuration when you install the `newrelic-infrastructure` subchart.
 
@@ -148,10 +148,33 @@ nginx-scaler   Deployment/nginx   34m/2     1         10        1          15m
 
 ## Generate Load
 
+Now that you've configured the NGINX OHI, configured the metrics adapter, and created the HPA resource - it's time to watch the magic happen.  Use the command below to create a load generation pod in your cluster which will hit the `nginx` service endpoint with a bunch of curl commands.
+
 ```
 $ kubectl apply -f loadgen.yaml -n demo
+pod/load-gen created
 ```
 
+Immediately after starting your load gen, run this command to watch the `nginx-scaler` HPA resource as it scales up your `nginx` deployment.
+
+```
+$ kubectl get hpa -n demo -w
+NAME           REFERENCE          TARGETS   MINPODS   MAXPODS   REPLICAS   AGE
+nginx-scaler   Deployment/nginx   34m/2     1         10        1          40m
+nginx-scaler   Deployment/nginx   192m/2    1         10        1          40m
+nginx-scaler   Deployment/nginx   1367m/2   1         10        1          40m
+nginx-scaler   Deployment/nginx   2534m/2   1         10        1          41m
+nginx-scaler   Deployment/nginx   3709m/2   1         10        1          41m
+nginx-scaler   Deployment/nginx   4717m/2   1         10        1          42m
+nginx-scaler   Deployment/nginx   4717m/2   1         10        2          42m
+nginx-scaler   Deployment/nginx   4209m/2   1         10        2          43m
+nginx-scaler   Deployment/nginx   4209m/2   1         10        2          43m
+nginx-scaler   Deployment/nginx   2467m/2   1         10        3          44m
+nginx-scaler   Deployment/nginx   2467m/2   1         10        4          44m
+nginx-scaler   Deployment/nginx   1880m/2   1         10        4          44m
+```
+
+You can watch this process visually by creating a multi-query chart in New Relic's query builder with the following NRQL queries:
 
 ```
 from Metric select average(nginx.server.net.requestsPerSecond) where k8s.namespaceName = 'demo' since 30 minutes ago TIMESERIES 30 seconds
@@ -161,6 +184,15 @@ from Metric select average(nginx.server.net.requestsPerSecond) where k8s.namespa
 FROM K8sPodSample select uniqueCount(podName) as 'Pod Count' where podName like 'nginx%' since 30 minutes ago TIMESERIES 30 seconds
 ```
 
-```
-kubectl get --raw "/apis/external.metrics.k8s.io/v1beta1/namespaces/*/nginx_average_requests?labelSelector=k8s.namespaceName=demo" | jq .
-```
+Here you can see as the average throughput increases, HPA kicks in and scales the deployment until the average throughput is below the target value of 2.
+
+![Autoscale](https://p191.p3.n0.cdn.getcloudapp.com/items/geupdnr1/e8b80301-7ecd-451d-b381-70fb52f23ff2.jpg?v=573739dcb397bcaf24e76c5d67161e7d)
+
+## Conclusion
+
+In this module, you completed the following:
+
+* Configured the NGINX OHI to auto-discover NGINX instances running in the cluster
+* Enabled the custom metrics adapter for HPA and configured a custom metric (`nginx_average_requests` for auto-scaling)
+* Created the `nginx-scaler` HPA resource
+* Generated load to the `nginx` service in order to trigger the auto-scaling process

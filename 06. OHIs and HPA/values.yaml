@@ -89,7 +89,7 @@ newrelic-k8s-metrics-adapter:
     accountID: <REDACTED>
     externalMetrics:
       nginx_average_requests:
-        query: "from Metric select average(nginx.server.net.requestsPerSecond) since 1 minutes ago"
+        query: "from Metric select average(nginx.server.net.requestsPerSecond) since 2 minutes ago"
 
 
 ####################
