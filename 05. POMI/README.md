@@ -73,7 +73,9 @@ nri-prometheus:
               - python_my_gauge
               - python_my_counter
 ```
+## Upgrading `newrelic-bundle`
 
+In order to make this configuration active, you'll need to upgrade the `newrelic-bundle` again.  Run the command below to apply the changes to your cluster.
 ```
 $ helm upgrade newrelic-bundle newrelic/nri-bundle -n newrelic --reuse-values -f ./values.yaml
 Release "newrelic-bundle" has been upgraded. Happy Helming!
@@ -85,7 +87,9 @@ REVISION: 2
 TEST SUITE: None
 ```
 
-Config map updated...
+A [ConfigMap](https://kubernetes.io/docs/concepts/configuration/configmap/) is an object used to store non-confidential data in key-value pairs.  Pods can consume ConfigMaps as environment variables, command-line arguments, or as configuration files in a volume.
+
+Validate that the changes were made to the `newrelic-bundle-nri-prometheus-config` ConfigMap by running the command below.  You should see the `transformations` section.
 
 ```
 $ kubectl describe configmap newrelic-bundle-nri-prometheus-config -n newrelic
@@ -120,11 +124,17 @@ transformations:
     - python
 verbose: false
 ```
-Restart Pod
+Updating a ConfigMap does not always cause the associated pods to automatically restart and pick up the changes.  Restart the `newrelic-bundle-nri-prometheus-*` pod so that the new configuration is picked up.
 
 ```
 $ kubectl delete pod newrelic-bundle-nri-prometheus-5544d858fb-rwtf9 -n newrelic
 pod "newrelic-bundle-nri-prometheus-5544d858fb-rwtf9" deleted
+```
+
+After a minute or so, validate that you're now _only_ seeing the `python_my_gauge` and `python_my_counter` metrics in the following NRQL query.
+
+```
+FROM Metric select uniques(metricName) where instrumentation.name = 'nri-prometheus' and clusterName = 'minikube-workshop' and metricName like 'python%' since 1 minutes ago
 ```
 ![no more metrics](https://p191.p3.n0.cdn.getcloudapp.com/items/d5u6Nnxq/3c64cf1b-46fa-4f32-942e-f6289628d279.jpg?v=e588426d95bcf87ddd90b605c74168e3)
 
