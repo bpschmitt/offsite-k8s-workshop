@@ -47,17 +47,17 @@ metrics-adapter:
 
 ###### Subchart Configuration #######
 
-# nri-prometheus:
-#   config:
-#     scrape_enabled_label: prometheus.io/scrape
-#     transformations:
-#       - description: "Workshop example"
-#         ignore_metrics:
-#           - prefixes:
-#               - python
-#             except:
-#               - python_my_gauge
-#               - python_my_counter
+nri-prometheus:
+  config:
+    scrape_enabled_label: prometheus.io/scrape
+    transformations:
+      - description: "Workshop example"
+        ignore_metrics:
+          - prefixes:
+              - python
+            except:
+              - python_my_gauge
+              - python_my_counter
 
 # newrelic-infrastructure:
 #   integrations_config:
