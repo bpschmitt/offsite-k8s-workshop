@@ -51,7 +51,7 @@ Now re-run the NRQL query and what do you see?
 _(It may take 30 seconds due to the polling interval - be patient and run the query a few times if you don't see anything returned immediately)_
 
 ```
-FROM Metric select uniques(metricName) where instrumentation.name = 'nri-prometheus' and clusterName = 'minikube-lab' and metricName like 'python%' since 2 minutes ago
+FROM Metric select uniques(metricName) where instrumentation.name = 'nri-prometheus' and clusterName = 'minikube-workshop' and metricName like 'python%' since 2 minutes ago
 ```
 ![Moar metrics](https://p191.p3.n0.cdn.getcloudapp.com/items/7KuAq6qZ/0ac47e14-a90b-4d4b-b6d0-0a321d15b519.jpg?v=68192dbc4f559d64744d1c1d0988be26
 )
@@ -84,6 +84,8 @@ STATUS: deployed
 REVISION: 2
 TEST SUITE: None
 ```
+
+Config map updated...
 
 ```
 $ kubectl describe configmap newrelic-bundle-nri-prometheus-config -n newrelic
@@ -118,6 +120,7 @@ transformations:
     - python
 verbose: false
 ```
+Restart Pod
 
 ```
 $ kubectl delete pod newrelic-bundle-nri-prometheus-5544d858fb-rwtf9 -n newrelic
