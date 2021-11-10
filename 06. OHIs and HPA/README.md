@@ -11,6 +11,7 @@ __Reading__:
 
 * Learn about the [Horizontal Pod Autoscaler](https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/)
 * Learn about options when running [helm upgrade](https://helm.sh/docs/helm/helm_upgrade/)
+* NGINX OHI config [examples](https://github.com/newrelic/nri-nginx/blob/master/nginx-config.yml.k8s_sample)
 
 ---
 
@@ -75,7 +76,7 @@ newrelic-k8s-metrics-adapter:
 ```
 
 
-## Updating the `newrelic-bundle` Helm release
+## Upgrading the `newrelic-bundle` Helm release
 
 Now that you've modified your `values.yaml` for both the NGINX OHI and the metrics adapter, it's time to upgrade the `newrelic-bundle` release with the new configuration.
 

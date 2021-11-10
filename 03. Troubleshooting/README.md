@@ -12,7 +12,7 @@ Describing a Kubernetes resource (in this case, a pod) will output its current c
 
 There are a few things of note here:
 
-* The container state and reason (Waiting - CreateContainerConfigError)
+* The container state and reason (`State: Waiting` - `Reason: CreateContainerConfigError`)
 * The conditions: `Ready: False` and `ContainersReady: False`
 * The pod events, specifically `Error: secret "nrlicensekey" not found`
 
@@ -86,35 +86,6 @@ Events:
   Normal   Pulled     68s (x231 over 51m)  kubelet            Container image "bpschmitt/nodejs-logs-k8s:0.5" already present on machine
 ```
 
-### Create the Secret
-
-Create the `nrlicensekey` secret using the command below.  The `logs-demo-*` pod should automatically start and the status should be `Running`.
-
-Do you remember the command to list the pods in a namespace?
-
-```
-[~]$ kubectl create secret generic nrlicensekey --from-literal=nrlicensekey=<YOUR LICENSE KEY> -n demo
-```
-
-You can validate that the secret was created successfully with the following command:
-```
-[~]$ kubectl get secret nrlicensekey -n demo
-NAME           TYPE     DATA   AGE
-nrlicensekey   Opaque   1      153m
-
-[~]$ kubectl describe secret nrlicensekey -n demo
-Name:         nrlicensekey
-Namespace:    demo
-Labels:       <none>
-Annotations:  <none>
-
-Type:  Opaque
-
-Data
-====
-nrlicensekey:  40 bytes
-```
-
 ### Events
 
 Sometimes the root cause of a cranky deployment may not be completely obvious from the pod events and you'll need to take a broader look at the cluster events.  You can do this with the `kubectl get event` command.  Note that the example below is scoped to the `demo` namespace.
@@ -135,6 +106,7 @@ LAST SEEN   TYPE      REASON              OBJECT                                
 59m         Normal    ScalingReplicaSet   deployment/nginx                                Scaled up replica set nginx-557dcdb56b to 1
 ...
 ```
+
 
 ### Logs
 

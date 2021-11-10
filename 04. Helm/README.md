@@ -4,13 +4,7 @@ Quite simply, Helm is a tool that streamlines the installation and management of
 
 New Relic's [helm chart repo](https://github.com/newrelic/helm-charts) contains the charts used in New Relic's Guided Install for Kubernetes.
 
-Let's get New Relic up and running in your cluster.  First, download the `values.yaml` file for the `nri-bundle` Helm chart using the command below:
-
-```
-curl -s https://raw.githubusercontent.com/newrelic/helm-charts/master/charts/nri-bundle/values.yaml -o values.yaml
-```
-
-Navigate to the Guided Install for Kubernetes in New Relic's UI and follow the prompts.  For this workshop, make the folloing selections:
+Let's get New Relic up and running in your cluster.  Navigate to the Guided Install for Kubernetes in New Relic's UI and follow the prompts.  For this workshop, make the folloing selections:
 
 ![Guided Install](https://p191.p3.n0.cdn.getcloudapp.com/items/2NuPPg7z/0c8e6b5e-bd71-4fca-9fc0-5add7cfb5a4f.jpg?v=0981942fbdfb62d1d0aefd320e8cf2d1)
 

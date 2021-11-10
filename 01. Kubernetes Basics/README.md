@@ -36,7 +36,7 @@ Namespaces provide a mechanism for isolating groups of resources within a single
 |Column|Description|
 ---|---
 |NAME|name of the namespace|
-|STATUS|status of the namespace. Will almost always be `Active` but be `Terminating` (though very rare).|
+|STATUS|status of the namespace. Will almost always be `Active`, sometimes `Terminating` (though very rare).|
 |AGE|age of the namespace|
 
 ```

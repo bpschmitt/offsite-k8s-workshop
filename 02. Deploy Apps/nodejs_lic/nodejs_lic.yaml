@@ -41,6 +41,6 @@ spec:
               name: nrlicensekey
               key: nrlicensekey
         - name: NEW_RELIC_APP_NAME
-          value: "myDemoApp"
+          value: "REPLACE_ME"
         - name: APP_TITLE
-          value: "myDemoApp"
+          value: "REPLACE_ME"
