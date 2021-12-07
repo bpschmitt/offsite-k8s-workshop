@@ -86,6 +86,11 @@ Events:
   Normal   Pulled     68s (x231 over 51m)  kubelet            Container image "bpschmitt/nodejs-logs-k8s:0.5" already present on machine
 ```
 
+To fix this issue, create a secret called `nrlicensekey` which contains your New Relic license key with the following command:
+```
+kubectl create secret generic nrlicensekey --from-literal=nrlicensekey=<NR LICENSE KEY> -n demo
+```
+
 ### Events
 
 Sometimes the root cause of a cranky deployment may not be completely obvious from the pod events and you'll need to take a broader look at the cluster events.  You can do this with the `kubectl get event` command.  Note that the example below is scoped to the `demo` namespace.
