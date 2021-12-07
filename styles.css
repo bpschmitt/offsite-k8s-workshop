@@ -3,8 +3,11 @@ body {
     background: black;
     color: white;
     text-align: center;
+<<<<<<< HEAD
 }
 
 body.p {
     color: white;
+=======
+>>>>>>> 10f04a1eab14d323399b787c97b399a9234b1788
 }
