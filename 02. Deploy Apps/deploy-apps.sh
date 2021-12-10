@@ -6,7 +6,7 @@ then
     echo "Usage: ./deploy-apps.sh myAppName"
     exit 1
 else
-    sed -i "" "s/REPLACE_ME/${1}/g" ./nodejs_lic/nodejs_lic.yaml
+    sed -i "s/REPLACE_ME/${1}/g" ./nodejs_lic/nodejs_lic.yaml
 fi
 
 kubectl apply -f crasher/crasher.yaml -n demo
