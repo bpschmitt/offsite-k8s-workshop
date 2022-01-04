@@ -23,7 +23,7 @@ The `kubectl get nodes` command outputs the following columns.
 |VERSION|the Kubernetes version running on the node|
 
 ```
-[~]$ kubectl get nodes
+$ kubectl get nodes
 NAME                STATUS   ROLES                  AGE   VERSION
 minikube-workshop   Ready    control-plane,master   11m   v1.20.7
 ```
@@ -40,7 +40,7 @@ Namespaces provide a mechanism for isolating groups of resources within a single
 |AGE|age of the namespace|
 
 ```
-[~]$ kubectl get namespaces
+$ kubectl get namespaces
 NAME              STATUS   AGE
 default           Active   13m
 kube-node-lease   Active   13m
