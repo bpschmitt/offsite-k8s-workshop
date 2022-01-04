@@ -24,6 +24,8 @@ The `kubectl get nodes` command outputs the following columns.
 
 ```
 $ kubectl get nodes
+```
+```
 NAME                STATUS   ROLES                  AGE   VERSION
 minikube-workshop   Ready    control-plane,master   11m   v1.20.7
 ```
