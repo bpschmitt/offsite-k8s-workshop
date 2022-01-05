@@ -1,6 +1,6 @@
 ## 01. Kubernetes Basics
 
-In this workshop, you'll cover some of the very basic `kubectl` commands and their output.  The goal is to get you comfortable with interacting with a Kubernetes cluster and interpreting the output of the various commands.  This is not a comprehensive list of Kubernetes resources but it does highlight some of the more common ones found in a cluster.
+asdfasIn this workshop, you'll cover some of the very basic `kubectl` commands and their output.  The goal is to get you comfortable with interacting with a Kubernetes cluster and interpreting the output of the various commands.  This is not a comprehensive list of Kubernetes resources but it does highlight some of the more common ones found in a cluster.
 
 **Reading:**
 * Learn about [Kubernetes Components](https://kubernetes.io/docs/concepts/overview/components/)
